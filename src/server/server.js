@@ -22,34 +22,29 @@ const InputError = require("../exceptions/InputError");
   server.route(routes);
 
   server.ext("onPreResponse", function (request, h) {
-    const response = request.response;
+  const response = request.response;
 
-    if (response instanceof InputError) {
-      const newResponse = h.response({
-        status: "fail",
-        message: `${response.message} Silakan gunakan foto lain.`,
-      });
-      // newResponse.code(response.statusCode);
-      newResponse.code(
-        Number.isInteger(response.statusCode) ? response.statusCode : 400
-      ); // Gunakan 400 jika statusCode tidak valid
-      return newResponse;
-    }
+  if (response instanceof InputError) {
+    const newResponse = h.response({
+      status: "fail",
+      message: `${response.message} Silakan gunakan foto lain.`,
+    });
+    newResponse.code(response.statusCode || 400); // Beri nilai default 400 jika `statusCode` tidak ada
+    return newResponse;
+  }
 
-    if (response.isBoom) {
-      const newResponse = h.response({
-        status: "fail",
-        message: response.message,
-      });
-      // newResponse.code(response.statusCode);
-      newResponse.code(
-        Number.isInteger(response.statusCode) ? response.statusCode : 500
-      ); // Gunakan 500 jika statusCode tidak valid
-      return newResponse;
-    }
+  if (response.isBoom) {
+    const newResponse = h.response({
+      status: "fail",
+      message: response.message,
+    });
+    newResponse.code(response.output?.statusCode || 500); // Gunakan `response.output.statusCode` atau default 500
+    return newResponse;
+  }
 
-    return h.continue;
-  });
+  return h.continue;
+});
+
 
   await server.start();
   console.log(`Server start at: ${server.info.uri}`);
