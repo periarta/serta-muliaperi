@@ -29,7 +29,10 @@ const InputError = require("../exceptions/InputError");
         status: "fail",
         message: `${response.message} Silakan gunakan foto lain.`,
       });
-      newResponse.code(response.statusCode);
+      // newResponse.code(response.statusCode);
+      newResponse.code(
+        Number.isInteger(response.statusCode) ? response.statusCode : 400
+      ); // Gunakan 400 jika statusCode tidak valid
       return newResponse;
     }
 
@@ -38,7 +41,10 @@ const InputError = require("../exceptions/InputError");
         status: "fail",
         message: response.message,
       });
-      newResponse.code(response.statusCode);
+      // newResponse.code(response.statusCode);
+      newResponse.code(
+        Number.isInteger(response.statusCode) ? response.statusCode : 500
+      ); // Gunakan 500 jika statusCode tidak valid
       return newResponse;
     }
 
